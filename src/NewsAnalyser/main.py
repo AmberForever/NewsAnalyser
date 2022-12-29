@@ -2,7 +2,7 @@ import asyncio
 from collections import deque
 from rss_parser import rss_parser
 from utils import create_logger
-from postgres_dwh import save_post
+from postgres_dwh import save_post, make_dds_and_marts
 
 from config import rss_channels
 
@@ -26,11 +26,10 @@ logger.info('Start...')
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
-
-# Press the green button in the gutter to run the script.
 #if __name__ == '__main__':
 
-# Добавляй в текущий event_loop rss парсеры
+# обрабатываем каналы и сохраняем публикации в базу данных
 for source, rss_link in rss_channels.items():
     rss_parser(source, rss_link, posted_q,  timeout, send_dwh_func, logger)
-
+# после закачки всех постов в stage формируем DDS и витрину
+make_dds_and_marts()
